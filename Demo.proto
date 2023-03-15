@@ -1,0 +1,7 @@
+syntax = "proto2";
+
+message Node {
+  required sint64 id = 1;
+  required sint64 lat = 2;
+  required sint64 lon = 3;
+}
