@@ -2,7 +2,7 @@
 using System.IO.Compression;
 using OSMPBF;
 
-FileStream fs = new FileStream("/var/home/kicsyromy/Downloads/romania-latest.osm.pbf", FileMode.Open);
+FileStream fs = new FileStream(@"", FileMode.Open);
 
 // Allocate enough bytes to hold a 32bit int
 byte[] buffer = new byte[4];
