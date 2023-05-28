@@ -1,0 +1,16 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        x:Class="Mapster.ClientApplication.MainWindow"
+        Width="800"
+        Height="480"
+        Title="Mapster Client Application">
+    <Grid Margin="5" ColumnDefinitions="*" RowDefinitions="Auto,*">
+		<Button Grid.Row="0" HorizontalAlignment="Right" Click="OnButtonPressed" Content="{Binding Model.Data}" />
+		<ScrollViewer Grid.Row="1">
+			<ItemsRepeater Items="{Binding Items}"></ItemsRepeater>
+		</ScrollViewer>
+	</Grid>
+</Window>
