@@ -1,27 +1,27 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-    <PropertyGroup>
-        <OutputType>Exe</OutputType>
-        <TargetFramework>net7.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <Configurations>Release;Debug</Configurations>
-        <Platforms>x64</Platforms>
-        <RootNamespace>Mapster.Service</RootNamespace>
-    </PropertyGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Configurations>Release;Debug</Configurations>
+    <Platforms>x64</Platforms>
+    <RootNamespace>Mapster.Service</RootNamespace>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\..\Common\Common.csproj" />
-        <ProjectReference Include="..\..\Rendering\TileRenderer\TileRenderer.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\Common.csproj" />
+    <ProjectReference Include="..\..\Rendering\TileRenderer\TileRenderer.csproj" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="CommandLineParser" Version="2.9.1" />
-        <PackageReference Include="Newtonsoft.Json.Bson" Version="1.0.2" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CommandLineParser" Version="2.9.0-preview1" />
+    <PackageReference Include="Newtonsoft.Json.Bson" Version="1.0.2" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <Folder Include="Endpoints\" />
-    </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Endpoints\" />
+  </ItemGroup>
 
 </Project>

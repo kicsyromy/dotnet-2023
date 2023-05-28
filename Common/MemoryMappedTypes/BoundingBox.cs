@@ -1,4 +1,4 @@
-namespace Mapster.Common.MemoryMappedTypes
+﻿namespace Mapster.Common.MemoryMappedTypes
 {
     public struct BoundingBox
     {
