@@ -108,39 +108,28 @@ public struct GeoFeature : BaseShape
     public GeoFeature(ReadOnlySpan<Coordinate> c, MapFeatureData feature)
     {
         IsPolygon = feature.Type == GeometryType.Polygon;
-        var naturalKey = feature.Properties.FirstOrDefault(x => x.Key == "natural").Value;
         Type = GeoFeatureType.Unknown;
-        if (naturalKey != null)
+        var properties = feature.Properties;
+
+        if ((properties & FeatureProperty.PlainNatural) != 0)
         {
-            if (naturalKey == "fell" ||
-                naturalKey == "grassland" ||
-                naturalKey == "heath" ||
-                naturalKey == "moor" ||
-                naturalKey == "scrub" ||
-                naturalKey == "wetland")
-            {
-                Type = GeoFeatureType.Plain;
-            }
-            else if (naturalKey == "wood" ||
-                     naturalKey == "tree_row")
-            {
-                Type = GeoFeatureType.Forest;
-            }
-            else if (naturalKey == "bare_rock" ||
-                     naturalKey == "rock" ||
-                     naturalKey == "scree")
-            {
-                Type = GeoFeatureType.Mountains;
-            }
-            else if (naturalKey == "beach" ||
-                     naturalKey == "sand")
-            {
-                Type = GeoFeatureType.Desert;
-            }
-            else if (naturalKey == "water")
-            {
-                Type = GeoFeatureType.Water;
-            }
+            Type = GeoFeatureType.Plain;
+        }
+        else if ((properties & FeatureProperty.ForestNatural) != 0)
+        {
+            Type = GeoFeatureType.Forest;
+        }
+        else if ((properties & FeatureProperty.MountainNatural) != 0)
+        {
+            Type = GeoFeatureType.Mountains;
+        }
+        else if ((properties & FeatureProperty.DesertNatural) != 0)
+        {
+            Type = GeoFeatureType.Desert;
+        }
+        else if ((properties & FeatureProperty.Water) != 0)
+        {
+            Type = GeoFeatureType.Water;
         }
 
         ScreenCoordinates = new PointF[c.Length];
@@ -149,6 +138,7 @@ public struct GeoFeature : BaseShape
                 (float)MercatorProjection.latToY(c[i].Latitude));
     }
 }
+
 
 public struct Railway : BaseShape
 {
@@ -202,18 +192,20 @@ public struct PopulatedPlace : BaseShape
         for (var i = 0; i < c.Length; i++)
             ScreenCoordinates[i] = new PointF((float)MercatorProjection.lonToX(c[i].Longitude),
                 (float)MercatorProjection.latToY(c[i].Latitude));
-        var name = feature.Properties.FirstOrDefault(x => x.Key == "name").Value;
+        // var name = feature.Properties.FirstOrDefault(x => x.Key == "name").Value;
 
-        if (feature.Label.IsEmpty)
-        {
-            ShouldRender = false;
-            Name = "Unknown";
-        }
-        else
-        {
-            Name = string.IsNullOrWhiteSpace(name) ? feature.Label.ToString() : name;
-            ShouldRender = true;
-        }
+        // if (feature.Label.IsEmpty)
+        // {
+        //     ShouldRender = false;
+        //     Name = "Unknown";
+        // }
+        // else
+        // {
+        //     Name = string.IsNullOrWhiteSpace(name) ? feature.Label.ToString() : name;
+        //     ShouldRender = true;
+        // }
+        ShouldRender = false;
+        Name = "Unknown";
     }
 
     public static bool ShouldBePopulatedPlace(MapFeatureData feature)
@@ -223,15 +215,12 @@ public struct PopulatedPlace : BaseShape
         {
             return false;
         }
-        foreach (var entry in feature.Properties)
-            if (entry.Key.StartsWith("place"))
-            {
-                if (entry.Value.StartsWith("city") || entry.Value.StartsWith("town") ||
-                    entry.Value.StartsWith("locality") || entry.Value.StartsWith("hamlet"))
-                {
-                    return true;
-                }
-            }
+        var properties = feature.Properties;
+
+        if ((properties & FeatureProperty.PopulatedPlaceTrue) != 0)
+        {
+            return true;
+        }
         return false;
     }
 }
@@ -260,25 +249,26 @@ public struct Border : BaseShape
     public static bool ShouldBeBorder(MapFeatureData feature)
     {
         // https://wiki.openstreetmap.org/wiki/Key:admin_level
-        var foundBoundary = false;
-        var foundLevel = false;
-        foreach (var entry in feature.Properties)
-        {
-            if (entry.Key.StartsWith("boundary") && entry.Value.StartsWith("administrative"))
-            {
-                foundBoundary = true;
-            }
-            if (entry.Key.StartsWith("admin_level") && entry.Value == "2")
-            {
-                foundLevel = true;
-            }
-            if (foundBoundary && foundLevel)
-            {
-                break;
-            }
-        }
+        // var foundBoundary = false;
+        // var foundLevel = false;
+        // foreach (var entry in feature.Properties)
+        // {
+        //     if (entry.Key.StartsWith("boundary") && entry.Value.StartsWith("administrative"))
+        //     {
+        //         foundBoundary = true;
+        //     }
+        //     if (entry.Key.StartsWith("admin_level") && entry.Value == "2")
+        //     {
+        //         foundLevel = true;
+        //     }
+        //     if (foundBoundary && foundLevel)
+        //     {
+        //         break;
+        //     }
+        // }
 
-        return foundBoundary && foundLevel;
+        // return foundBoundary && foundLevel;
+        return true;
     }
 }
 

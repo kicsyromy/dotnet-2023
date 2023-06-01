@@ -20,12 +20,12 @@ public delegate bool MapFeatureDelegate(MapFeatureData featureData);
 public readonly ref struct MapFeatureData
 {
     public long Id { get; init; }
-
     public GeometryType Type { get; init; }
     public ReadOnlySpan<char> Label { get; init; }
     public ReadOnlySpan<Coordinate> Coordinates { get; init; }
-    public Dictionary<string, string> Properties { get; init; }
+    public FeatureProperty Properties { get; init; }
 }
+
 
 /// <summary>
 ///     Represents a file with map data organized in the following format:<br />
@@ -141,6 +141,82 @@ public unsafe class DataFile : IDisposable
         GetString(stringsOffset, charsOffset, i, out key);
         GetString(stringsOffset, charsOffset, i + 1, out value);
     }
+    private FeatureProperty ParseProperties(Dictionary<string, string> properties)
+{
+    FeatureProperty result = FeatureProperty.None;
+
+    foreach (var property in properties)
+    {
+        string key = property.Key;
+        string value = property.Value;
+
+        if (key == "highway" && MapFeature.HighwayTypes.Any(v => value.StartsWith(v)))
+            result |= FeatureProperty.Highway;
+
+        if (key.StartsWith("water"))
+            result |= FeatureProperty.Water;
+
+        if (key.StartsWith("border"))
+            result |= FeatureProperty.Border;
+
+            if (key.StartsWith("place"))
+            {
+                if (value.StartsWith("city") || value.StartsWith("town") || value.StartsWith("locality") || value.StartsWith("hamlet"))
+                    result |= FeatureProperty.PopulatedPlaceTrue;
+                else
+                    result |= FeatureProperty.PopulatedPlaceFalse;
+            }
+
+
+            if (key.StartsWith("railway"))
+            result |= FeatureProperty.Railway;
+
+        if (key.StartsWith("natural") && (value.StartsWith("grassland") || value.StartsWith("fell")  || value.StartsWith("heath")  || value.StartsWith("moor")  || value.StartsWith("scrub")  || value.StartsWith("wetland") ))
+            result |= FeatureProperty.PlainNatural;
+
+        if (key.StartsWith("natural") && value.StartsWith("water"))
+            result |= FeatureProperty.WaterNatural;
+        
+        if (key.StartsWith("natural") && (value.StartsWith("wood") || value.StartsWith("tree_row") ))
+            result |= FeatureProperty.ForestNatural;
+        
+        if (key.StartsWith("natural") && (value.StartsWith("bare_rock") || value.StartsWith("rock")  || value.StartsWith("scree") ))
+            result |= FeatureProperty.MountainNatural;
+
+         if (key.StartsWith("natural") && (value.StartsWith("beach") || value.StartsWith("sand")))
+            result |= FeatureProperty.DesertNatural;
+
+        if (key.StartsWith("boundary") && value.StartsWith("forest"))
+            result |= FeatureProperty.ForestBoundary;
+
+        if (key.StartsWith("landuse") && (value.StartsWith("forest") || value.StartsWith("orchard")))
+            result |= FeatureProperty.ForestLanduse;
+
+        if (key.StartsWith("landuse") && (value.StartsWith("residential") || value.StartsWith("cemetery") || value.StartsWith("industrial") || value.StartsWith("commercial") ||
+                                          value.StartsWith("square") || value.StartsWith("construction") || value.StartsWith("military") || value.StartsWith("quarry") ||
+                                          value.StartsWith("brownfield")))
+            result |= FeatureProperty.ResidentialLanduse;
+
+        if (key.StartsWith("landuse") && (value.StartsWith("farm") || value.StartsWith("meadow") || value.StartsWith("grass") || value.StartsWith("greenfield") ||
+                                          value.StartsWith("recreation_ground") || value.StartsWith("winter_sports") || value.StartsWith("allotments")))
+            result |= FeatureProperty.PlainLanduse;
+
+        if (key.StartsWith("landuse") && (value.StartsWith("reservoir") || value.StartsWith("basin")))
+            result |= FeatureProperty.ReservoirLanduse;
+
+        if (key.StartsWith("building"))
+            result |= FeatureProperty.Building;
+
+        if (key.StartsWith("leisure"))
+            result |= FeatureProperty.Leisure;
+
+        if (key.StartsWith("amenity"))
+            result |= FeatureProperty.Amenity;
+    }
+
+    return result;
+}
+
 
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void ForeachFeature(BoundingBox b, MapFeatureDelegate? action)
@@ -188,17 +264,20 @@ public unsafe class DataFile : IDisposable
                         properties.Add(key.ToString(), value.ToString());
                     }
 
+                    var parsedProperties = ParseProperties(properties);
+
                     if (!action(new MapFeatureData
-                        {
-                            Id = feature->Id,
-                            Label = label,
-                            Coordinates = coordinates,
-                            Type = feature->GeometryType,
-                            Properties = properties
-                        }))
+                    {
+                        Id = feature->Id,
+                        Label = label,
+                        Coordinates = coordinates,
+                        Type = feature->GeometryType,
+                        Properties = parsedProperties
+                    }))
                     {
                         break;
                     }
+
                 }
             }
         }
