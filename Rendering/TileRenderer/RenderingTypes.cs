@@ -192,20 +192,20 @@ public struct PopulatedPlace : BaseShape
         for (var i = 0; i < c.Length; i++)
             ScreenCoordinates[i] = new PointF((float)MercatorProjection.lonToX(c[i].Longitude),
                 (float)MercatorProjection.latToY(c[i].Latitude));
-        // var name = feature.Properties.FirstOrDefault(x => x.Key == "name").Value;
+       // var name = feature.Properties.FirstOrDefault(x => x.Key == "name").Value;
+        var name = feature.Label.ToString();
 
-        // if (feature.Label.IsEmpty)
-        // {
-        //     ShouldRender = false;
-        //     Name = "Unknown";
-        // }
-        // else
-        // {
-        //     Name = string.IsNullOrWhiteSpace(name) ? feature.Label.ToString() : name;
-        //     ShouldRender = true;
-        // }
-        ShouldRender = false;
-        Name = "Unknown";
+        if (feature.Label.IsEmpty)
+        {
+            ShouldRender = false;
+            Name = "Unknown";
+        }
+        else
+        {
+            Name = string.IsNullOrWhiteSpace(name) ? feature.Label.ToString() : name;
+            ShouldRender = true;
+        }
+
     }
 
     public static bool ShouldBePopulatedPlace(MapFeatureData feature)
